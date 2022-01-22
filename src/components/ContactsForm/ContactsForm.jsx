@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import s from './ContactsForm.module.css';
-import { useState } from 'react';
+import { useLocaleStorage } from '../../hooks/useLocaleStorage';
 
 function ContactsForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [name, setName] = useLocaleStorage('name', '');
+  const [number, setNumber] = useLocaleStorage('number', '');
 
-  const handleChange = e => {
-    const { name, value } = e.target;
+  const hundleChange = e => {
+    const { name, value } = e.currentTarget;
     switch (name) {
       case 'name':
         setName(value);
@@ -20,9 +20,9 @@ function ContactsForm({ onSubmit }) {
     }
   };
 
-  const handleSubmit = e => {
+  const hundleSubmit = e => {
     e.preventDefault();
-    onSubmit(name, number);
+    onSubmit({ name, number });
     reset();
   };
 
@@ -32,34 +32,33 @@ function ContactsForm({ onSubmit }) {
   };
 
   return (
-    <form className={s.form} onSubmit={handleSubmit}>
+    <form className={s.form} onSubmit={hundleSubmit}>
       <label className={s.label}>
         Name
         <input
           className={s.input}
           placeholder="Don Omar"
-          value={name}
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           type="text"
           name="name"
+          value={name}
+          onChange={hundleChange}
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
-          onChange={handleChange}
         />
       </label>
-
       <label className={s.label}>
         Number
         <input
           className={s.input}
+          placeholder="555-55-55"
           type="tel"
+          name="number"
+          value={number}
+          onChange={hundleChange}
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-          value={number}
-          placeholder="555-55-55"
-          name="number"
           required
-          onChange={handleChange}
         />
       </label>
       <button className={s.button} type="submit">
@@ -70,7 +69,12 @@ function ContactsForm({ onSubmit }) {
 }
 
 ContactsForm.propTypes = {
-  onSubmit: PropTypes.func,
+  stats: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      number: PropTypes.number.isRequired,
+    }),
+  ),
 };
 
 export default ContactsForm;

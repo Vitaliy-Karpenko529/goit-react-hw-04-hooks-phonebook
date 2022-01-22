@@ -1,56 +1,63 @@
-import { useState } from 'react';
-import Filter from './components/Filter/Filter';
-import ContactsList from './components/ContactsList/ContactsList';
-import ContactsForm from './components/ContactsForm/ContactsForm';
-import 'modern-normalize/modern-normalize.css';
+import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
-import useLocaleStorage from './hooks/useLocaleStorage';
+import 'modern-normalize/modern-normalize.css';
+import Container from './components/Container/Container';
+import ContactsForm from './components/ContactsForm/ContactsForm';
+import ContactsList from './components/ContactsList/ContactsList';
+import Filter from './components/Filter/Filter';
+import { useLocaleStorage } from '../src/hooks/useLocaleStorage';
 
-function App() {
-  const [contacts, setContacts] = useLocaleStorage('contacts', []);
+const Title = ['Title'];
+
+export default function App() {
   const [filter, setFilter] = useState('');
+  const [contacts, setContacts] = useLocaleStorage('contacts', []);
 
   const addContact = ({ name, number }) => {
-    const newContact = {
+    const nweContact = {
       id: nanoid(),
       name,
       number,
     };
 
-    contacts.find(
-      contact => newContact.name.toLowerCase() === contact.name.toLowerCase(),
-    )
-      ? alert(`${newContact.name} you heve this contact`)
-      : setContacts(prevContact => [newContact, ...prevContact]);
+    if (
+      contacts.find(
+        contact => contact.name.toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      alert(`${nweContact.name} you heve this contact`);
+      return;
+    }
+    setContacts([nweContact, ...contacts]);
   };
 
-  const deleteContact = contactId => {
-    setContacts(previousState =>
-      previousState.filter(contact => contact.id !== contactId),
+  const handleChangeFilter = e => {
+    setFilter(e.currentTarget.value);
+  };
+
+  const getFilteredContacts = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter),
     );
   };
 
-  const handleChangeFilter = e => setFilter(e.target.value);
-
-  const getFilteredContacts = () => {
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase()),
+  const deleteContact = contactId => {
+    setContacts(prevState =>
+      prevState.filter(contact => contact.id !== contactId),
     );
   };
 
   return (
-    <div>
-      <h1>Phonebook</h1>
+    <Container>
+      <h1 className={Title}>Phonebook</h1>
       <ContactsForm onSubmit={addContact} />
-
-      <h2>Contacts</h2>
+      <h2 className={Title}>Contacts</h2>
       <Filter value={filter} onChange={handleChangeFilter} />
       <ContactsList
-        contacts={getFilteredContacts}
+        contacts={getFilteredContacts()}
         onDeleteContact={deleteContact}
       />
-    </div>
+    </Container>
   );
 }
-
-export default App;

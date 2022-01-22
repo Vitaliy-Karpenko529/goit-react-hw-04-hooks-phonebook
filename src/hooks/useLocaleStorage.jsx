@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const useValue = (key, initValue) => {
+const getValue = (key, initValue) => {
   const value = localStorage.getItem(key);
   if (value) {
     try {
@@ -11,10 +10,10 @@ const useValue = (key, initValue) => {
   }
   return initValue;
 };
-export default function useLocaleStorage(key, initValue) {
-  const [state, setState] = useState(useValue(key, initValue));
+export const useLocaleStorage = (key, initValue) => {
+  const [state, setState] = useState(getValue(key, initValue));
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(state));
   }, [key, state]);
   return [state, setState];
-}
+};
